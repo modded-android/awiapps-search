@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "awfixer-app",
-    "slug": "awfixer-app",
+    "name": "search",
+    "slug": "search",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -43,6 +43,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "5d51fc88-ba0d-493c-9d8f-657e91ff77ba"
+      }
+    },
+    "owner": "awfixer"
   }
 }

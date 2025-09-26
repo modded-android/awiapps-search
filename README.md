@@ -1,50 +1,51 @@
-# Welcome to your Expo app 👋
+# Privacy-Focused Search App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is a mobile app built with [Expo](https://expo.dev) for fast, trustworthy, and efficient web searches. Unlike bloated search engines, this app prioritizes quality over quantity—no sponsored results, no review boosting, no ads. It provides scores for content quality, ad/tracker presence, and bias analysis to help you find reliable information quickly and exit the app.
 
-## Get started
+## Features
+- **Unbiased Search**: Powered by Brave Search API for ad-free, privacy-focused results.
+- **Quality Scores**: Each result includes scores for content quality (1-100), ads/trackers (lower is better), and bias analysis.
+- **Search Summary**: Overview of results with averages and potential bias variables.
+- **Efficient UX**: Clean interface designed to get you results fast and out of the app.
+- **Cross-Platform**: Runs on Android, iOS, and web.
 
-1. Install dependencies
+## Getting Started
 
+1. **Install Dependencies**:
    ```bash
    npm install
    ```
 
-2. Start the app
+2. **Set Up API Key**:
+   - Sign up for a Brave Search API key at [https://api.search.brave.com/](https://api.search.brave.com/).
+   - Add it to the `.env` file:
+     ```
+     BRAVE_API_KEY=your_actual_api_key_here
+     ```
 
+3. **Start the App**:
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+   Open in your preferred platform (Android emulator, iOS simulator, or web).
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## How It Works
+- Enter a search query in the Search tab.
+- View results with scores and a summary.
+- Tap a result to open it in your browser.
+- Check the Info tab for tips, philosophy, and recent searches.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Philosophy
+This app is the anti-Google: no manipulation, no distractions. We believe in empowering users with transparent, high-quality search results that respect privacy and efficiency.
 
-## Get a fresh project
+## Learn More
+- [Expo Documentation](https://docs.expo.dev/)
+- [Brave Search API](https://api.search.brave.com/)
+- [Expo Router](https://docs.expo.dev/router/introduction/)
 
-When you're ready, run:
+## Contributing
+Feel free to contribute improvements, especially for more accurate scoring algorithms or additional features.
 
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## License
+This project is open-source. Use at your own risk.

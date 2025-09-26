@@ -1,98 +1,179 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import {
+  StyleSheet,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
+import { useState } from "react";
+import { Linking } from "react-native";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { Link } from "expo-router";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+interface SearchResult {
+  id: string;
+  title: string;
+  url: string;
+  description: string;
+  qualityScore: number;
+  adTrackerScore: number;
+  biasScore: number;
+}
+
+interface SearchSummary {
+  totalResults: number;
+  avgQuality: number;
+  avgAdTracker: number;
+  avgBias: number;
+  biasVariables: string[];
+}
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [summary, setSummary] = useState<SearchSummary | null>(null);
+  const [loading, setLoading] = useState(false);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const BRAVE_API_KEY = process.env.BRAVE_API_KEY; // Set in .env file
+
+  const handleSearch = async () => {
+    if (!query.trim()) return;
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}`,
+        {
+          headers: {
+            "X-Subscription-Token": BRAVE_API_KEY,
+          },
+        },
+      );
+      const data = await response.json();
+      const webResults = data.web?.results || [];
+
+      // Transform results and add mock scores
+      const transformedResults: SearchResult[] = webResults.map(
+        (item: any, index: number) => ({
+          id: item.id || index.toString(),
+          title: item.title,
+          url: item.url,
+          description: item.description,
+          qualityScore: Math.floor(Math.random() * 100) + 1, // Mock: 1-100
+          adTrackerScore: Math.floor(Math.random() * 100) + 1, // Mock: Lower is better (fewer ads/trackers)
+          biasScore: Math.floor(Math.random() * 100) + 1, // Mock: 1-100 (lower bias better?)
+        }),
+      );
+
+      setResults(transformedResults);
+
+      // Generate mock summary
+      const total = transformedResults.length;
+      const avgQuality =
+        total > 0
+          ? transformedResults.reduce((sum, r) => sum + r.qualityScore, 0) /
+            total
+          : 0;
+      const avgAdTracker =
+        total > 0
+          ? transformedResults.reduce((sum, r) => sum + r.adTrackerScore, 0) /
+            total
+          : 0;
+      const avgBias =
+        total > 0
+          ? transformedResults.reduce((sum, r) => sum + r.biasScore, 0) / total
+          : 0;
+      const biasVariables = [
+        "Political slant",
+        "Commercial bias",
+        "Source credibility",
+      ]; // Mock
+
+      setSummary({
+        totalResults: total,
+        avgQuality: Math.round(avgQuality),
+        avgAdTracker: Math.round(avgAdTracker),
+        avgBias: Math.round(avgBias),
+        biasVariables,
+      });
+    } catch (error) {
+      Alert.alert(
+        "Error",
+        "Failed to fetch search results. Check your API key.",
+      );
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderResult = ({ item }: { item: SearchResult }) => (
+    <TouchableOpacity
+      style={styles.resultItem}
+      onPress={() => Linking.openURL(item.url)}
+    >
+      <ThemedText type="subtitle">{item.title}</ThemedText>
+      <ThemedText>{item.description}</ThemedText>
+      <ThemedText>
+        Quality: {item.qualityScore}/100 | Ads/Trackers: {item.adTrackerScore}
+        /100 | Bias: {item.biasScore}/100
+      </ThemedText>
+      <ThemedText style={styles.url}>{item.url}</ThemedText>
+    </TouchableOpacity>
+  );
+
+  return (
+    <ThemedView style={styles.container}>
+      <TextInput
+        style={styles.searchBar}
+        placeholder="Search the web..."
+        value={query}
+        onChangeText={setQuery}
+        onSubmitEditing={handleSearch}
+      />
+      {loading && <ActivityIndicator size="large" />}
+      {summary && (
+        <ThemedView style={styles.summary}>
+          <ThemedText type="title">Search Summary</ThemedText>
+          <ThemedText>Total Results: {summary.totalResults}</ThemedText>
+          <ThemedText>Avg Quality: {summary.avgQuality}/100</ThemedText>
+          <ThemedText>Avg Ads/Trackers: {summary.avgAdTracker}/100</ThemedText>
+          <ThemedText>Avg Bias: {summary.avgBias}/100</ThemedText>
+          <ThemedText>
+            Bias Variables: {summary.biasVariables.join(", ")}
+          </ThemedText>
+        </ThemedView>
+      )}
+      <FlatList
+        data={results}
+        keyExtractor={(item) => item.id}
+        renderItem={renderResult}
+        ListEmptyComponent={
+          loading ? null : (
+            <ThemedText>No results yet. Enter a query and search.</ThemedText>
+          )
+        }
+      />
+      <Link href="/modal" style={styles.link}>
+        <ThemedText type="link">About This App</ThemedText>
+      </Link>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: { flex: 1, padding: 16 },
+  searchBar: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    marginBottom: 16,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+  summary: { marginBottom: 16, padding: 8, backgroundColor: "#f0f0f0" },
+  resultItem: { padding: 16, borderBottomWidth: 1, borderBottomColor: "#ccc" },
+  url: { fontSize: 12, color: "blue" },
+  link: { marginTop: 16, alignSelf: "center" },
 });
