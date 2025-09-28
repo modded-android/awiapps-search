@@ -52,6 +52,30 @@ This is a mobile app built with [Expo](https://expo.dev) for fast, trustworthy, 
 
    Open in your preferred platform (Android emulator, iOS simulator, or web).
 
+## Building the App
+
+Build the app for Android and iOS using the automated build script:
+
+```bash
+# Build for all platforms (preview profile)
+npm run build
+
+# Build for specific platforms
+npm run build:android
+npm run build:ios
+
+# Build for production (App Store/Play Store)
+npm run build:production
+
+# Build locally (requires Android Studio/Xcode)
+npm run build:local
+
+# Preview build commands without executing
+npm run build:dry-run
+```
+
+For detailed build options and troubleshooting, see [Build Script Documentation](docs/build-script.md).
+
 ## Backend API Server
 
 The project now includes a comprehensive Go backend that provides:
