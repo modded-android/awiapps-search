@@ -36,35 +36,42 @@ export default function HomeScreen() {
   const [summary, setSummary] = useState<SearchSummary | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const BRAVE_API_KEY = process.env.BRAVE_API_KEY; // Set in .env file
-
   const handleSearch = async () => {
     if (!query.trim()) return;
     setLoading(true);
-    try {
-      const response = await fetch(
-        `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}`,
+    // Mock API call with simulated delay
+    setTimeout(() => {
+      const mockWebResults = [
         {
-          headers: {
-            "X-Subscription-Token": BRAVE_API_KEY,
-          },
+          id: "1",
+          title: "Mock Result 1: " + query,
+          url: "https://example.com/1",
+          description: "A high-quality result for " + query,
         },
-      );
-      const data = await response.json();
-      const webResults = data.web?.results || [];
+        {
+          id: "2",
+          title: "Mock Result 2: " + query,
+          url: "https://example.com/2",
+          description: "Another result with low ads for " + query,
+        },
+        {
+          id: "3",
+          title: "Mock Result 3: " + query,
+          url: "https://example.com/3",
+          description: "Balanced bias result for " + query,
+        },
+      ];
 
       // Transform results and add mock scores
-      const transformedResults: SearchResult[] = webResults.map(
-        (item: any, index: number) => ({
-          id: item.id || index.toString(),
-          title: item.title,
-          url: item.url,
-          description: item.description,
-          qualityScore: Math.floor(Math.random() * 100) + 1, // Mock: 1-100
-          adTrackerScore: Math.floor(Math.random() * 100) + 1, // Mock: Lower is better (fewer ads/trackers)
-          biasScore: Math.floor(Math.random() * 100) + 1, // Mock: 1-100 (lower bias better?)
-        }),
-      );
+      const transformedResults: SearchResult[] = mockWebResults.map((item) => ({
+        id: item.id,
+        title: item.title,
+        url: item.url,
+        description: item.description,
+        qualityScore: Math.floor(Math.random() * 100) + 1, // Mock: 1-100
+        adTrackerScore: Math.floor(Math.random() * 100) + 1, // Mock: Lower is better (fewer ads/trackers)
+        biasScore: Math.floor(Math.random() * 100) + 1, // Mock: 1-100 (lower bias better?)
+      }));
 
       setResults(transformedResults);
 
@@ -97,15 +104,8 @@ export default function HomeScreen() {
         avgBias: Math.round(avgBias),
         biasVariables,
       });
-    } catch (error) {
-      Alert.alert(
-        "Error",
-        "Failed to fetch search results. Check your API key.",
-      );
-      console.error(error);
-    } finally {
       setLoading(false);
-    }
+    }, 1000); // Simulate 1 second delay
   };
 
   const renderResult = ({ item }: { item: SearchResult }) => (
