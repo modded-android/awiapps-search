@@ -10,7 +10,7 @@
   [![Discord Presence](https://lanyard-profile-readme.vercel.app/api/940285292944961537?hideDiscrim=true)](https://discord.com/users/940285292944961537)
 
 > [!NOTE]
-> This project is currently developed by me, and only me (plus my AI buddies and the voices in my head. If you enjoy the project feel free to let me know when your applying to join the community at the very bottom. Donating a few bucks helps too... <3
+> This project is currently developed by me, and only me (plus my AI buddies and the voices in my head.) If you enjoy the project feel free to let me know when your applying to join the community at the very bottom. Donating a few bucks helps too... <3
 
 ## Contributing
 Feel free to contribute improvements, especially for more accurate scoring algorithms or additional features. Please refer to [Issues], [Pulls], and [Discussions]. Duplicates will be closed with prejudice. 
