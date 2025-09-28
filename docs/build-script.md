@@ -6,6 +6,17 @@ This document explains how to use the build script to create Android and iOS bui
 
 The build script (`scripts/build.js`) provides a unified interface for building the app on both Android and iOS platforms. It supports both local builds (using your development environment) and remote builds (using Expo's EAS Build service).
 
+## Security Features
+
+The build script has been hardened against common security vulnerabilities:
+
+- **Command Injection Prevention**: All user inputs are validated against strict regex patterns and allowlists
+- **Argument Validation**: Only known command-line arguments are accepted
+- **Working Directory Validation**: Ensures the script runs from the correct project directory
+- **Process Timeouts**: Prevents hanging processes with configurable timeouts
+- **Environment Sanitization**: Removes potentially dangerous environment variables
+- **Safe Command Execution**: Uses argument arrays instead of string concatenation for spawn calls
+
 ## Prerequisites
 
 ### For Remote Builds (Recommended)

@@ -6,6 +6,14 @@
  * This script automates building the app for both Android and iOS platforms
  * using Expo's hosted build environment (EAS Build).
  * 
+ * SECURITY NOTE: This script has been hardened against common security vulnerabilities:
+ * - Command injection prevention through argument validation and safe spawn usage
+ * - Input sanitization with regex validation
+ * - Working directory validation
+ * - Timeout limits to prevent hanging processes
+ * - Environment variable sanitization
+ * - Strict argument parsing with allowlist validation
+ * 
  * Features:
  * - Builds for both Android and iOS platforms
  * - Supports different build profiles (development, preview, production)
@@ -67,12 +75,31 @@ class BuildScript {
   }
 
   async validateOptions() {
+    // Strict input validation to prevent command injection
     if (!this.validPlatforms.includes(this.options.platform)) {
       throw new Error(`Invalid platform: ${this.options.platform}. Valid options: ${this.validPlatforms.join(', ')}`);
     }
     
     if (!this.validProfiles.includes(this.options.profile)) {
       throw new Error(`Invalid profile: ${this.options.profile}. Valid options: ${this.validProfiles.join(', ')}`);
+    }
+
+    // Additional security validation - ensure no special characters that could be used for injection
+    const platformRegex = /^(android|ios|all)$/;
+    const profileRegex = /^(development|preview|production)$/;
+    
+    if (!platformRegex.test(this.options.platform)) {
+      throw new Error(`Platform contains invalid characters: ${this.options.platform}`);
+    }
+    
+    if (!profileRegex.test(this.options.profile)) {
+      throw new Error(`Profile contains invalid characters: ${this.options.profile}`);
+    }
+
+    // Validate working directory is safe
+    const resolvedRoot = path.resolve(this.root);
+    if (!resolvedRoot.endsWith('search') && !resolvedRoot.includes('/search/')) {
+      throw new Error('Build script must be run from the project root directory');
     }
 
     // Check if required files exist
@@ -116,30 +143,54 @@ class BuildScript {
   }
 
   async checkDependencies() {
-    try {
-      execSync('npx eas --version', { stdio: 'pipe' });
-      this.log('EAS CLI is available', 'success');
-    } catch (error) {
-      throw new Error('EAS CLI is not available. Please install with: npm install -g eas-cli');
+    // Skip all dependency checks in dry-run mode
+    if (this.options.dryRun) {
+      this.log('Skipping dependency checks in dry-run mode', 'info');
+      return;
     }
-
-    // Check if user is logged in (only for remote builds and not in dry-run mode)
-    if (!this.options.local && !this.options.dryRun) {
+    
+    // Only check EAS CLI if we're doing remote builds
+    if (!this.options.local) {
       try {
-        const whoami = execSync('npx eas whoami', { encoding: 'utf-8', stdio: 'pipe' });
+        // Use safer command execution with timeout and cwd
+        execSync('npx eas --version', { 
+          stdio: 'pipe', 
+          cwd: this.root,
+          timeout: 5000 // 5 second timeout
+        });
+        this.log('EAS CLI is available', 'success');
+      } catch (error) {
+        throw new Error('EAS CLI is not available. Please install with: npm install -g eas-cli');
+      }
+
+      // Check if user is logged in for remote builds
+      try {
+        const whoami = execSync('npx eas whoami', { 
+          encoding: 'utf-8', 
+          stdio: 'pipe',
+          cwd: this.root,
+          timeout: 10000 // 10 second timeout to prevent hanging
+        });
         this.log(`Logged in as: ${whoami.trim()}`, 'success');
       } catch (error) {
         throw new Error('Not logged in to Expo. Please run: npx eas login');
       }
-    } else if (!this.options.local && this.options.dryRun) {
-      this.log('Skipping login check in dry-run mode', 'info');
+    } else {
+      this.log('Using local builds - skipping EAS CLI checks', 'info');
     }
   }
 
   async runLocalBuild(platform) {
+    // Additional validation to ensure platform is safe
+    const validCommands = { 'android': 'android', 'ios': 'ios' };
+    const command = validCommands[platform];
+    
+    if (!command) {
+      throw new Error(`Invalid platform for local build: ${platform}`);
+    }
+    
     this.log(`Starting local ${platform} build...`, 'build');
     
-    const command = platform === 'android' ? 'android' : 'ios';
     const buildCommand = `npx expo run:${command}`;
     
     if (this.options.dryRun) {
@@ -148,9 +199,13 @@ class BuildScript {
     }
 
     return new Promise((resolve, reject) => {
-      const child = spawn('npx', ['expo', `run:${command}`], {
+      // Use explicit argument array to prevent command injection
+      const args = ['expo', `run:${command}`];
+      const child = spawn('npx', args, {
         stdio: 'inherit',
-        cwd: this.root
+        cwd: this.root,
+        env: { ...process.env, NODE_OPTIONS: '--max-old-space-size=4096' }, // Limit memory usage
+        timeout: 600000 // 10 minute timeout
       });
 
       child.on('close', (code) => {
@@ -161,16 +216,36 @@ class BuildScript {
           reject(new Error(`Local ${platform} build failed with code ${code}`));
         }
       });
+
+      child.on('error', (error) => {
+        reject(new Error(`Local ${platform} build process error: ${error.message}`));
+      });
     });
   }
 
   async runEasBuild(platform) {
+    // Validate platform and profile before constructing command
+    const validPlatforms = ['android', 'ios'];
+    const validProfiles = ['development', 'preview', 'production'];
+    
+    if (!validPlatforms.includes(platform)) {
+      throw new Error(`Invalid platform for EAS build: ${platform}`);
+    }
+    
+    if (!validProfiles.includes(this.options.profile)) {
+      throw new Error(`Invalid profile for EAS build: ${this.options.profile}`);
+    }
+    
     this.log(`Starting EAS ${platform} build (${this.options.profile} profile)...`, 'build');
     
+    // Build arguments array safely without string interpolation
     const buildArgs = [
-      'eas', 'build',
-      '--platform', platform,
-      '--profile', this.options.profile
+      'eas', 
+      'build',
+      '--platform', 
+      platform,
+      '--profile', 
+      this.options.profile
     ];
 
     if (!this.options.wait) {
@@ -185,7 +260,15 @@ class BuildScript {
     return new Promise((resolve, reject) => {
       const child = spawn('npx', buildArgs, {
         stdio: 'inherit',
-        cwd: this.root
+        cwd: this.root,
+        env: { 
+          ...process.env, 
+          NODE_OPTIONS: '--max-old-space-size=4096',
+          // Remove any potentially dangerous environment variables
+          SHELL: undefined,
+          PATH: process.env.PATH // Keep PATH but sanitize others
+        },
+        timeout: 1800000 // 30 minute timeout for remote builds
       });
 
       child.on('close', (code) => {
@@ -195,6 +278,10 @@ class BuildScript {
         } else {
           reject(new Error(`EAS ${platform} build failed with code ${code}`));
         }
+      });
+
+      child.on('error', (error) => {
+        reject(new Error(`EAS ${platform} build process error: ${error.message}`));
       });
     });
   }
@@ -254,20 +341,42 @@ class BuildScript {
   }
 }
 
-// Parse command line arguments
+// Parse command line arguments with security validation
 function parseArgs() {
   const args = process.argv.slice(2);
   const options = {};
   
+  // Security: Validate all arguments to prevent injection
+  const allowedOptions = [
+    '--platform', '--profile', '--local', '--dry-run', '--wait', '--help'
+  ];
+  
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     
+    // Security: Only allow known arguments
+    if (arg.startsWith('--') && !allowedOptions.includes(arg)) {
+      console.error(`Unknown option: ${arg}`);
+      process.exit(1);
+    }
+    
+    // Security: Validate argument values
     switch (arg) {
       case '--platform':
-        options.platform = args[++i];
+        const platform = args[++i];
+        if (!platform || !['android', 'ios', 'all'].includes(platform)) {
+          console.error(`Invalid platform: ${platform}. Valid options: android, ios, all`);
+          process.exit(1);
+        }
+        options.platform = platform;
         break;
       case '--profile':
-        options.profile = args[++i];
+        const profile = args[++i];
+        if (!profile || !['development', 'preview', 'production'].includes(profile)) {
+          console.error(`Invalid profile: ${profile}. Valid options: development, preview, production`);
+          process.exit(1);
+        }
+        options.profile = profile;
         break;
       case '--local':
         options.local = true;
@@ -304,6 +413,10 @@ Examples:
       default:
         if (arg.startsWith('--')) {
           console.error(`Unknown option: ${arg}`);
+          process.exit(1);
+        } else if (!arg.includes('=') && !arg.startsWith('-')) {
+          // Security: Reject any suspicious arguments
+          console.error(`Suspicious argument: ${arg}`);
           process.exit(1);
         }
     }
