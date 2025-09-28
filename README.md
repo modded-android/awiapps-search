@@ -1,3 +1,7 @@
+[![Sourcery](https://img.shields.io/badge/Sourcery-enabled-brightgreen)](https://sourcery.ai)
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/awfixer/search?utm_source=oss&utm_medium=github&utm_campaign=awfixer%2Fsearch&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
+
+
 # Privacy-Focused Search App
 
 This is a mobile app built with [Expo](https://expo.dev) for fast, trustworthy, and efficient web searches. Unlike bloated search engines, this app prioritizes quality over quantity—no sponsored results, no review boosting, no ads. It provides scores for content quality, ad/tracker presence, and bias analysis to help you find reliable information quickly and exit the app.
@@ -52,6 +56,30 @@ This is a mobile app built with [Expo](https://expo.dev) for fast, trustworthy, 
 
    Open in your preferred platform (Android emulator, iOS simulator, or web).
 
+## Building the App
+
+Build the app for Android and iOS using the automated build script:
+
+```bash
+# Build for all platforms (preview profile)
+npm run build
+
+# Build for specific platforms
+npm run build:android
+npm run build:ios
+
+# Build for production (App Store/Play Store)
+npm run build:production
+
+# Build locally (requires Android Studio/Xcode)
+npm run build:local
+
+# Preview build commands without executing
+npm run build:dry-run
+```
+
+For detailed build options and troubleshooting, see [Build Script Documentation](docs/build-script.md).
+
 ## Backend API Server
 
 The project now includes a comprehensive Go backend that provides:
@@ -89,20 +117,25 @@ For detailed backend documentation, see [backend/README.md](backend/README.md).
 
 ### Package Updates
 
-Keep your dependencies up to date with the built-in package update script:
+Keep dependencies up to date across all environments with the built-in multi-environment package update script:
 
 ```bash
-# Check for available updates
+# Check for available updates (Node.js, Go, Python)
 npm run update-packages:dry-run
 
-# Update packages safely (minor/patch versions only)
+# Update packages safely (minor/patch versions only, all environments)
 npm run update-packages
 
-# Update all packages including major versions (use with caution)
+# Update all packages including major versions (use with caution, all environments)
 npm run update-packages:major
 ```
 
-See [Package Update Documentation](docs/package-updates.md) for detailed usage and safety features.
+The script automatically detects and updates:
+- **Node.js packages** in `package.json`
+- **Go modules** in `backend/go.mod`
+- **Python packages** in requirements files (if present)
+
+See [Multi-Environment Package Update Documentation](docs/package-updates.md) for detailed usage and safety features.
 
 ## How It Works
 - Enter a search query in the Search tab.
