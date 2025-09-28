@@ -9,6 +9,20 @@ This is a mobile app built with [Expo](https://expo.dev) for fast, trustworthy, 
 - **Efficient UX**: Clean interface designed to get you results fast and out of the app.
 - **Cross-Platform**: Runs on Android, iOS, and web.
 
+## Architecture
+
+### Frontend (React Native/Expo)
+- **Mobile App**: Cross-platform search interface for Android, iOS, and web
+- **Quality Scoring UI**: Visual representation of content quality, bias, and ad/tracker metrics
+- **Fast Navigation**: Optimized for quick search and result access
+
+### Backend (Go API Server)
+- **Search Services**: Kagi and Brave Search API integrations with fallback support
+- **AI Services**: OpenAI, Claude, Xai, and OpenRouter for content analysis and bias detection
+- **Sentry Monitoring**: Comprehensive error tracking and performance monitoring
+- **Security**: Rate limiting, CORS protection, input validation, and secure headers
+- **Health Monitoring**: Service availability checks and usage statistics
+
 ## Getting Started
 
 1. **Install Dependencies**:
@@ -23,12 +37,53 @@ This is a mobile app built with [Expo](https://expo.dev) for fast, trustworthy, 
      BRAVE_API_KEY=your_actual_api_key_here
      ```
 
-3. **Start the App**:
+3. **Start the Backend (Optional but Recommended)**:
+   ```bash
+   cd backend
+   go run cmd/server/main.go
+   ```
+   
+   The backend provides real search functionality and AI analysis. See [backend/README.md](backend/README.md) for detailed setup instructions.
+
+4. **Start the App**:
    ```bash
    npx expo start
    ```
 
    Open in your preferred platform (Android emulator, iOS simulator, or web).
+
+## Backend API Server
+
+The project now includes a comprehensive Go backend that provides:
+
+### 🔍 **Search Services**
+- **Kagi Search API** - Premium privacy-focused search results
+- **Brave Search API** - Alternative search with ad-free results  
+- **Automatic Fallback** - Seamless switching between providers
+- **Quality Scoring** - Automated content quality analysis
+
+### 🤖 **AI-Powered Analysis**
+- **Content Summarization** - AI-powered result summaries
+- **Bias Detection** - Automated bias scoring and analysis
+- **Multiple AI Providers** - OpenAI, Claude, Xai, OpenRouter support
+- **Intelligent Fallbacks** - Service redundancy for reliability
+
+### 📊 **Monitoring & Security**
+- **Sentry Integration** - Real-time error tracking and performance monitoring
+- **Rate Limiting** - API abuse protection
+- **CORS & Security Headers** - Production-ready security
+- **Health Checks** - Service availability monitoring
+
+### 🚀 **Quick Backend Setup**
+```bash
+cd backend
+go mod download
+go run cmd/server/main.go
+```
+
+Server starts at `http://localhost:8080` with health check at `/health`.
+
+For detailed backend documentation, see [backend/README.md](backend/README.md).
 
 ## Maintenance
 
