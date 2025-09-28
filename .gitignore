@@ -46,3 +46,25 @@ pnpm-lock.yaml
 package-lock.json
 *.lock
 package.json.backup-*
+
+# Go specific
+backend/search-server
+backend/.env
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+go.work.sum
+
+# Go vendor directory
+backend/vendor/
+
+# Go module download cache
+backend/go/
+
+# Temporary files
+backend/tmp/
