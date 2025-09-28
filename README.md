@@ -30,6 +30,25 @@ This is a mobile app built with [Expo](https://expo.dev) for fast, trustworthy, 
 
    Open in your preferred platform (Android emulator, iOS simulator, or web).
 
+## Maintenance
+
+### Package Updates
+
+Keep your dependencies up to date with the built-in package update script:
+
+```bash
+# Check for available updates
+npm run update-packages:dry-run
+
+# Update packages safely (minor/patch versions only)
+npm run update-packages
+
+# Update all packages including major versions (use with caution)
+npm run update-packages:major
+```
+
+See [Package Update Documentation](docs/package-updates.md) for detailed usage and safety features.
+
 ## How It Works
 - Enter a search query in the Search tab.
 - View results with scores and a summary.
