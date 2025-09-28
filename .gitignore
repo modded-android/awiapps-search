@@ -45,3 +45,4 @@ app-example
 pnpm-lock.yaml
 package-lock.json
 *.lock
+package.json.backup-*
