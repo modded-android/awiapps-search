@@ -45,7 +45,14 @@ app-example
 pnpm-lock.yaml
 package-lock.json
 *.lock
+
+# Backup files created by update script
 package.json.backup-*
+go.mod.backup-*
+go.sum.backup-*
+requirements*.backup-*
+pyproject.toml.backup-*
+Pipfile.backup-*
 
 # Go specific
 backend/search-server

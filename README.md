@@ -117,20 +117,25 @@ For detailed backend documentation, see [backend/README.md](backend/README.md).
 
 ### Package Updates
 
-Keep your dependencies up to date with the built-in package update script:
+Keep dependencies up to date across all environments with the built-in multi-environment package update script:
 
 ```bash
-# Check for available updates
+# Check for available updates (Node.js, Go, Python)
 npm run update-packages:dry-run
 
-# Update packages safely (minor/patch versions only)
+# Update packages safely (minor/patch versions only, all environments)
 npm run update-packages
 
-# Update all packages including major versions (use with caution)
+# Update all packages including major versions (use with caution, all environments)
 npm run update-packages:major
 ```
 
-See [Package Update Documentation](docs/package-updates.md) for detailed usage and safety features.
+The script automatically detects and updates:
+- **Node.js packages** in `package.json`
+- **Go modules** in `backend/go.mod`
+- **Python packages** in requirements files (if present)
+
+See [Multi-Environment Package Update Documentation](docs/package-updates.md) for detailed usage and safety features.
 
 ## How It Works
 - Enter a search query in the Search tab.
