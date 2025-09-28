@@ -7,7 +7,7 @@ require (
 	github.com/getsentry/sentry-go/gin v0.35.3
 	github.com/gin-gonic/gin v1.11.0
 	github.com/joho/godotenv v1.5.1
-	github.com/sashabaranov/go-openai v1.39.0
+	github.com/sashabaranov/go-openai v1.41.2
 )
 
 require (
