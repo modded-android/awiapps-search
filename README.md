@@ -1,3 +1,7 @@
+[![Sourcery](https://img.shields.io/badge/Sourcery-enabled-brightgreen)](https://sourcery.ai)
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/awfixer/search?utm_source=oss&utm_medium=github&utm_campaign=awfixer%2Fsearch&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
+
+
 # Privacy-Focused Search App
 
 This is a mobile app built with [Expo](https://expo.dev) for fast, trustworthy, and efficient web searches. Unlike bloated search engines, this app prioritizes quality over quantity—no sponsored results, no review boosting, no ads. It provides scores for content quality, ad/tracker presence, and bias analysis to help you find reliable information quickly and exit the app.
