@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "search",
-    "slug": "search",
+    "name": "awsearch",
+    "slug": "awsearch",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "awfixerapp",
+    "scheme": "awsearch",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
