@@ -1,0 +1,77 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+app-example
+
+# generated native folders
+/ios
+/android
+
+pnpm-lock.yaml
+package-lock.json
+*.lock
+
+# Backup files created by update script
+package.json.backup-*
+go.mod.backup-*
+go.sum.backup-*
+requirements*.backup-*
+pyproject.toml.backup-*
+Pipfile.backup-*
+
+# Go specific
+backend/search-server
+backend/.env
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+go.work.sum
+
+# Go vendor directory
+backend/vendor/
+
+# Go module download cache
+backend/go/
+
+# Temporary files
+backend/tmp/
